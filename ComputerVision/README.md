@@ -1,52 +1,88 @@
-# Face Landmarker Webcam
+# ComputerVision - README general
 
-Projet minimal pour ouvrir la webcam et afficher le maillage du visage en temps reel avec MediaPipe.
+Ce dossier regroupe deux mini-projets de vision par ordinateur:
 
-## Fichiers utiles
+- Face Landmarker (MediaPipe)
+- YOLO-World Webcam (Ultralytics)
 
-- [webcam_simple.py](webcam_simple.py)
-- [face_landmarker.task](face_landmarker.task)
-- [.venv](.venv)
+## Structure du dossier
 
-## Ce que fait le script actuel
+- `Face-landmark-detection/`
+  - `webcam_simple.py`
+  - `face_landmarker.task`
+  - `blaze_face_short_range.tflite`
+  - `README.md`
+- `YOLO-World/`
+  - `yoloworld_webcam.py`
+  - `yolov8s-worldv2.pt` (telecharge automatiquement au premier lancement si absent)
+  - `README.md`
+- `.venv/` (environnement virtuel Python)
 
-- ouvre la webcam en 1280x720
-- met l'image en miroir pour l'effet selfie
-- detecte les visages avec MediaPipe
-- affiche le maillage facial en vert
-- affiche des points du visage en jaune
-- affiche le nombre de visages detectes
-- quitte avec la touche `Q`
+## Prerequis
 
-## Lancer le script
+- Windows
+- Python (de preference via `.venv`)
+- Webcam
 
-```powershell
-cd C:\Users\PixUser\Desktop\ComputerVision
-.\.venv\Scripts\python.exe webcam_simple.py
-```
-
-## Si le modele manque
-
-Le script attend le fichier `face_landmarker.task` dans le dossier du projet.
-
-Pour le retel charger:
+Activation de l'environnement virtuel (PowerShell):
 
 ```powershell
-Invoke-WebRequest -Uri "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task" -OutFile "face_landmarker.task"
+(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& C:/Users/PixUser/Desktop/ComputerVision/.venv/Scripts/Activate.ps1)
 ```
 
-## Dependances
+## Installation des dependances
 
-Si tu veux reinstaller les packages de base:
+Depuis la racine du projet:
 
 ```powershell
-cd C:\Users\PixUser\Desktop\ComputerVision
-.\.venv\Scripts\python.exe -m pip install mediapipe opencv-python
+cd C:/Users/PixUser/Desktop/ComputerVision
+.\.venv\Scripts\python.exe -m pip install mediapipe opencv-python ultralytics
 ```
 
-## Notes
+## Demarrer Face Landmarker
 
-Le script utilise le mode `VIDEO` de MediaPipe parce qu'il est adapte au flux en direct de la webcam. Ce n'est pas une video fichier.
+```powershell
+cd C:/Users/PixUser/Desktop/ComputerVision/Face-landmark-detection
+py webcam_simple.py
+```
 
-Si tu veux garder un projet propre avec juste la webcam, tu peux supprimer les anciens fichiers d'exemple image ou video s'ils ne te servent plus.
+Reference detaillee:
+- voir `Face-landmark-detection/README.md`
 
+## Demarrer YOLO-World
+
+Lancement simple:
+
+```powershell
+cd C:/Users/PixUser/Desktop/ComputerVision/YOLO-World
+py yoloworld_webcam.py --model yolov8s-worldv2.pt
+```
+
+Lancement plus rapide (GPU + reglages perf):
+
+```powershell
+py yoloworld_webcam.py --model yolov8s-worldv2.pt --device 0 --half --imgsz 416 --frame-width 960 --frame-height 540
+```
+
+Reference detaillee:
+- voir `YOLO-World/README.md`
+
+## Depannage rapide
+
+- La commande `-- model` est invalide (espace en trop)
+  - Correct: `--model`
+- Si YOLO tourne a ~3 FPS, c'est souvent du CPU
+  - verifier CUDA avec:
+
+```powershell
+C:/Users/PixUser/Desktop/ComputerVision/.venv/Scripts/python.exe -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+```
+
+- Quitter les applications webcam:
+  - appuyer sur `q`
+
+## Conseils
+
+- Ferme les applis qui utilisent deja la webcam (Teams, Discord, navigateur).
+- Pour plus de FPS: baisse `--imgsz` (416 ou 320) et la resolution webcam.
+- Pour un rendu plus stable en detection, limite les classes avec `--classes`.
